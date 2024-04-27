@@ -10,11 +10,15 @@ def process_file(filepath, colunas_indesejadas):
         if not filepath.lower().endswith(".csv"):
             return "O arquivo não é um CSV."
         df = pd.read_csv(filepath) # Loading CSV
-        df = df.astype(str) # All Cells to String
-        # Replace Specified Characters in All Cells
-        df = df.apply(lambda cell: str(cell.replace('ã', 'a').replace('Ã', 'A').replace('õ', 'o').replace('Õ', 'O').replace('ç', 'c').replace('Ç', 'C')))
         # Remove Unwanted Columns
         df = df.drop(columns=colunas_indesejadas, errors='ignore') # Remover Colunas Indesejadas
+        df = df.astype(str) # All Cells to String
+        # Replace Specified Characters in All Cells
+        for coluna in df.columns:
+            df[coluna] = df[coluna].apply(lambda cell: cell.replace('ã', 'a').replace('Ã', 'A').replace('õ', 'o').replace('Õ', 'O').replace('ç', 'c').replace('Ç', 'C').replace('nan',''))
+        # Reordering Columns
+        new_order = ["Cliente/Fornecedor", "Número do Documento", "Valor (R$)", "Vencimento", "Quitado", "Data Realizado", "Observação", "Etiquetas"]
+        df = df[new_order]
         df.to_csv("movimentacoes-filtradas.csv", index=False) # Save/Name File
         return df.head()
     except Exception as e:
@@ -32,7 +36,7 @@ def process_and_display(result_text, colunas_indesejadas):
 
 def gui_setup():
     # Lista Colunas A Remover
-    colunas_indesejadas = ['Tipo', 'Transferência', 
+    colunas_indesejadas = ['Conciliado', 'Quitado Parcialmente', 'Tipo', 'Transferência', 
     'Id da Conta Financeira', 'Nome da Conta Financeira', 
     'Tipo de Repetiçao', 'Parcela', 'Observação/Descrição', 
     'Competência', 'Data Conciliação', 'Valor Previsto', 

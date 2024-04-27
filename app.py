@@ -49,19 +49,33 @@ def gui_setup():
     root = tk.Tk() # Main Window:
     root.title("Filtrar Relatório Movimentação")
 
-    result_text = tk.Text(root, height=10, width=50)
+    result_text = tk.Text(root, height=5, width=50)
     result_text.pack()
+    label = tk.Label(root,text="As colunas listadas abaixo serão removidas:", )
+    label.pack(pady=10)
+    label.config(font=("TkDefaultFont", 14), fg="black")
+    label.config(state='disabled')
 
-    label = tk.Label(root,text="A remover as colunas:")
-    label.pack()
-
-    text = tk.Text(root, height='10', width='80')
+    text_frame = tk.Frame(root)
+    text_frame.pack()
+    text_scroll = tk.Scrollbar(text_frame, orient=tk.VERTICAL)
+    text = tk.Text(text_frame, height='6', width='30', yscrollcommand=text_scroll.set)
+    text_scroll.config(command=text.yview)
+    text_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+    text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    counter = len(colunas_indesejadas)
     for i in colunas_indesejadas:
-        text.insert(tk.END, i + '\n')
+        centered_text = i.center(text['width'])
+        counter -=1
+        if counter != 0:
+            centered_text + '\n'
+        text.insert(tk.END, centered_text)
+        counter -= 1
+    text.config(state='disabled')
     text.pack()
 
     process_button = tk.Button(root, text="Selecionar arquivo e processar", command=lambda: process_and_display(result_text, colunas_indesejadas))
-    process_button.pack(pady=30, side='top', anchor='center')
+    process_button.pack(pady=10,side='top', anchor='center')
     
     root.mainloop()
 
